@@ -1,6 +1,13 @@
 ---
 sidebar_position: 3
+title: 2.3 config.txt Configuration File
 ---
+
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
+
 # 2.3 config.txt Configuration File
 
 RDK uses the configuration file `config.txt` to set system configurations during startup. `config.txt` is read during the `uboot` stage and supports modifications to device tree configurations, IO pin states, ION memory, CPU frequency, etc. This file is usually accessible from Linux at `/boot/config.txt` and must be edited as the `root` user. If the `config.txt` file does not exist but there are configuration settings, simply create it as a new text file.
@@ -9,7 +16,7 @@ RDK uses the configuration file `config.txt` to set system configurations during
 
 :::info Note
 
-1. The `config.txt` configuration file is only applicable to the `RDK X3` and `RDK X3 Module` development boards and not for the `RDK Ultra` development board.
+1. The `config.txt` configuration file is only applicable to the `RDK X3`, `RDK X3 Module`, and `RDK X5` development boards and not for the `RDK Ultra` development board.
 
 2. The system version must be at least `2.1.0`.
 
@@ -33,21 +40,40 @@ dtdebug=1
 
 Supports device tree overlays, providing a more flexible way to adjust the device tree.
 
-[X5 not supported] For example, to adjust the size of `ION` memory using `ion_resize`, the following configuration will modify the `ION` memory size to `1GB`.
+<Tabs groupId="rdk-type">
+<TabItem value="x3" label="RDK X3 and RDK X3 Module">
+
+For example, to adjust the size of `ION` memory using `ion_resize`, the following configuration will modify the `ION` memory size to `1GB`.
 
 ```Shell
 dtoverlay=ion_resize,size=0x40000000
 ```
+</TabItem>
 
-[Only X5 supports] Use dtoverlay_spi5_spidev to add /dev/spidev5.0（Note: The CAN device has also received SPI5, so Spidev and CAN can only choose one from the other）
+<TabItem value="x5" label="RDK X5">
+
+Use `dtoverlay_spi5_spidev` to add /dev/spidev5.0（Note: The CAN device has also received SPI5, so Spidev and CAN can only choose one from the other）
+
 
 ```Shell
 dtoverlay=dtoverlay_spi5_spidev
 ```
 
-### [Only X5 supports]ion
+</TabItem>
+</Tabs>
 
-use ion_reserved_size ion_carveout_size ion_cma_size  to modify the ION partition size
+### ion
+
+<Tabs groupId="rdk-type">
+<TabItem value="x3" label="RDK X3 and RDK X3 Module">
+
+Not supported.
+
+</TabItem>
+
+<TabItem value="x5" label="RDK X5">
+
+Use `ion_reserved_size`, `ion_carveout_size`, and `ion_cma_size`  to modify the ION partition size.
 
 | boot name       | dts name        | dts compatible | size |
 | ----------------- | ------------ | ----------------- | ---- |
@@ -61,13 +87,21 @@ ion=ion_carveout_size=0x14000000
 ion=ion_cma_size=0x08000000
 ```
 
+</TabItem>
+</Tabs>
+
 ### dtparam
 
 Supports enabling and disabling buses such as uart, i2c, spi, i2s, etc.
 
-Currently supported options: uart3, spi0, spi1, spi2, i2c0, i2c1, i2c2, i2c3, i2c4, i2c5, i2s0, i2s1
+Currently supported options:
 
-[X5] uart0, uart1, uart5, spi1, spi5, i2c0, i2c2, i2c3, i2c4, i2c5, i2c6, i2c7, dw_i2s0, dw_i2s1
+| &nbsp; | RDK X3 and RDK X3 Module | RDK X5 |
+| --- | --- | --- |
+| UART | uart3 | uart0, uart1, uart5 |
+| SPI | spi0, spi1, spi2 | spi1, spi5 |
+| I2C | i2c0, i2c1, i2c2, i2c3, i2c4, i2c5 | i2c0, i2c2, i2c3, i2c4, i2c5, i2c6, i2c7 |
+| I2S | i2s0, i2s1 | dw_i2s0, dw_i2s1 |
 
 For example, to disable uart3:
 
@@ -78,6 +112,13 @@ dtparam=uart3=off
 For example, to enable i2c5:
 
 ```
+dtparam=i2c5=on
+```
+
+Use separate lines to enable or disable multiple components:
+
+```
+dtparam=uart3=off
 dtparam=i2c5=on
 ```
 
@@ -103,7 +144,7 @@ For example, setting the CPU to run in performance mode:
 governor=performance
 ```
 
-Refer to [CPU Frequency Management](frequency_management#cpu频率管理) for more information on CPU scheduling methods.
+Refer to [CPU Frequency Management](frequency_management#cpu-frequency-management) for more information on CPU scheduling methods.
 
 ### frequency
 
@@ -194,24 +235,39 @@ Shutdown temperature point of the system. If the temperature exceeds this point,
 
 ## Option Filtering
 
-Supports the use of [] to set filtering items. The filtering items need to be added at the end of the configuration file, because the part before the filtering item is considered 'all'. Once a filtering setting is added, the subsequent configurations belong to that filtering attribute until the end of the configuration file or another filtering item is set.
+Supports the use of `[]` to set filtering items. Filters must be added at the end of the configuration file, because any lines before the filter are considered 'all', meaning that they apply to all hardware types. Once a filter is added, subsequent configurations belonging to that filter will be applied, until the end of the file or another filter appears.
 
 The supported filtering items are differentiated by hardware model, and the following filtering items are supported:
 
 | Filtering Item | Compatible Models         |
 | -------------- | ------------------------- |
 | [all]          | All hardware, default     |
-| [rdkv1]        | RDK x3 v1.0, RDK x3 v1.1  |
-| [rdkv1.2]      | RDK x3 v1.2               |
-| [rdkv2]        | RDK x3 v2.1               |
-| [rdkmd]        | RDK x3 Module             |
+| [rdkv1]        | RDK X3 v1.0, RDK X3 v1.1  |
+| [rdkv1.2]      | RDK X3 v1.2               |
+| [rdkv2]        | RDK X3 v2.1               |
+| [rdkmd]        | RDK X3 Module             |
 | [x5-rdk]  | RDK X5 V0.1             |
+
+For example, the following configuration file could be used:
+
+```
+# Applies to all hardware configurations
+governor=powersave
+
+[rdkv1]
+governor=conservative  # Only applies to RDK X3 v1.0 or RDK X3 v1.1
+
+[x5-rdk]
+governor=performance  # Only applies to RDK X5
+```
+
+In the above example, the default CPU governor is `powersave`. If the board is an RDK X3 with version v1.0 or v1.1, the governor is set to `conservative`. Finally, if the board is an RDK X5, the governor is set to `performance`.
 
 ## Voltage Domain
 
 ### voltage_domain
 
-Configures the voltage domain of the 40-pin, supporting configuration as 3.3V or 1.8V. If not configured, the default is 3.3V.
+Configures the voltage domain of the 40-pin interface, supporting configuration as 3.3V or 1.8V. If not configured, the default is 3.3V.
 
 This configuration item needs to be used in conjunction with the jumper cap for voltage domain switching on the hardware.
 
@@ -224,7 +280,7 @@ Only RDK Module supports this configuration.
 For example, to configure the 40-pin of the `RDK Module` to work in `3v3` voltage mode, the following example uses `[rdkmd]` as the filtering item:
 
 ```
-# Voltage domain configuration for 40 Pin, 3.3V or 1.8V, defualt 3.3V
+# Voltage domain configuration for 40 Pin, 3.3V or 1.8V, default 3.3V
 # Only RDK Module supported
 [rdkmd]
 voltage_domain=3.3V

@@ -9,7 +9,7 @@ This section mainly introduces the methods for modifying the wired and wireless 
 
 Video: https://www.youtube.com/watch?v=omaAU6sab2A&list=PLSxjn4YS2IuFUWcLGj2_uuCfLYnNYw6Ld&index=8
 
-The default wired network configuration of the development board uses static IP configuration, and the initial IP address is `192.168.1.10`. Users can switch between static and DHCP modes by the following methods.
+The default wired network configuration of the development board uses static IP configuration, and the initial IP address depends on the board and software version used (see [Network Status Configuration](/Quick_start/remote_login#network-status-confirmation)). Users can switch between static and DHCP modes by the following methods.
 
 ### Modifying Static IP Configuration
 The development board's static network configuration is saved in the `/etc/network/interfaces` file. By modifying the `address`, `netmask`, `gateway`, and other fields, the static IP configuration can be modified. `metric` is the network priority configuration, setting it to `700` is to lower the priority of the wired network. When both wired and wireless networks are enabled, the wireless network will be prioritized. For example:
@@ -309,7 +309,7 @@ The Bluetooth function of the development board X3 is not enabled by default, wh
 - Create the `messagebus` user and group, which are required for the operation of the `dbus-daemon` program
 - Run `brcm_patchram_plus` to load the Bluetooth driver and firmware
 - Continuously check if the `/sys/class/bluetooth/hci0` directory exists to confirm that the Bluetooth driver is running properly
-- The appearance of **Done setting line discpline** indicates that the Bluetooth has been successfully enabled
+- The appearance of **Done setting line discipline** indicates that the Bluetooth has been successfully enabled
 - Execute `hciconfig hci0 up` to bring up the Bluetooth Link
 - Execute `hciconfig hci0 piscan` to perform Bluetooth scanning (this step can be excluded depending on the situation)
 
@@ -358,4 +358,4 @@ Then comes the pairing with other Bluetooth devices:
 
 ![image-20220601154414717](../../../../../static/img/02_System_configuration/image/hardware_interface/image-20220601154414717.png)
 
-After the above operations, the basic functions of Bluetooth scanning and pairing are completed. For more functions, please refer to the official help documentation of `BlueZ`.
+After the above operations, the basic functions of Bluetooth scanning and pairing are completed. For more functions, please refer to the official help documentation of [`BlueZ`](https://www.bluez.org/).

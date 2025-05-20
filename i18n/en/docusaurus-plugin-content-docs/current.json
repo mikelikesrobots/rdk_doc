@@ -16,7 +16,7 @@
     "description": "The label for category 2. 系统配置 in sidebar tutorialSidebar"
   },
   "sidebar.tutorialSidebar.category.2. 系统配置.link.generated-index.description": {
-    "message": "System Configuration",
+    "message": "System Configuration including Network & Bluetooth setup, startup configuration, thermal control, and autostarting programs.",
     "description": "The generated-index page description for category 2. 系统配置 in sidebar tutorialSidebar"
   },
   "sidebar.tutorialSidebar.category.3. 基础应用开发": {
